@@ -1,44 +1,35 @@
-Vue.component('component-lecturas',{
+Vue.component('component-libros',{
     data:()=>{
         return {
             msg    : '',
             status : false,
             error  : false,
             buscar : "",
-            lectura:{
-                accion    : 'nuevo',
-                idLectura : 0,
-                fecha     : '',
-                lecturas  : []
+            libro:{
+                idLibro : 0,
+                idAutor:  0,
+                codigo : '',
+                editorial : '',
+                edicion : '',
+        
             },
-            lecturas:[]
+            libros:[]
         }
     },
     methods:{
-        calcularPago(lecturaCliente){
-            let rango = lecturaCliente.lactual - lecturaCliente.lanterior;
-            if(rango>=1 && rango<=18){
-                lecturaCliente.pago = 6;
-            }
-            if(rango>=19 && rango<=28){
-                lecturaCliente.pago = (rango - 18)*0.45 + 6;
-            }
-            if(rango>=29){
-                lecturaCliente.pago = (rango - 28)*0.65 + 10.5; 
-            }
-        },
+       
         nuevaLectura(){
             this.limpiar();
-            let store = this.abrirStore('tbllecturas','readonly'),
+            let store = this.abrirStore('tbllibros','readonly'),
                 data = store.getAll();
             data.onsuccess=resp=>{
                 if(data.result.length==0){
-                    let clientes = this.abrirStore('tblclientes','readonly'),
-                        datosClientes = clientes.getAll();
+                    let autores = this.abrirStore('tblclientes','readonly'),
+                        datosClientes = autores.getAll();
                     datosClientes.onsuccess=datacliente=>{
                         datosClientes.result.forEach(element => {
-                            this.lectura.lecturas.push({
-                                cliente   : element.nombre,
+                            this.libro.libros.push({
+                                autor   : element.nombre,
                                 lanterior : 0,
                                 lactual   : '',
                                 pago      : ''
@@ -46,31 +37,31 @@ Vue.component('component-lecturas',{
                         });
                     };
                 } else {
-                    data.result[data.result.length - 1].lecturas.forEach(element => {
-                        this.lectura.lecturas.push({
-                            cliente   : element.cliente, 
+                    data.result[data.result.length - 1].libros.forEach(element => {
+                        this.libro.libros.push({
+                            autor   : element.autor, 
                             lanterior : element.lactual, 
                             lactual   : '', 
                             pago   : '', 
                         });
                     });
                 }
-                this.lectura.fecha = new Date().toISOString().slice(0,10);
+                this.libro.fecha = new Date().toISOString().slice(0,10);
             };
         },
         buscandoLectura(){
-            this.lecturas = this.lecturas.filter((element,index,lecturas) => new Date(element.fecha).toLocaleDateString().indexOf(this.buscar)>=0);
+            this.libros = this.libros.filter((element,index,libros) => new Date(element.fecha).toLocaleDateString().indexOf(this.buscar)>=0);
             if( this.buscar.length<=0){
                 this.obtenerDatos();
             }
         },
         async guardarLectura(){
             
-            let store = this.abrirStore("tbllecturas",'readwrite');
-            if( this.lectura.accion=='nuevo' ){
-                this.lectura.idLectura = generarIdUnicoDesdeFecha();
+            let store = this.abrirStore("tbllibros",'readwrite');
+            if( this.libro.accion=='nuevo' ){
+                this.libro.idLibro = generarIdUnicoDesdeFecha();
             }
-            let query = store.put(this.lectura);
+            let query = store.put(this.libro);
             query.onsuccess=event=>{
                 this.obtenerDatos();
                 this.limpiar();
@@ -96,27 +87,27 @@ Vue.component('component-lecturas',{
             }, time*1000);
         },
         obtenerDatos(){
-            let store = this.abrirStore('tbllecturas','readonly'),
+            let store = this.abrirStore('tbllibros','readonly'),
                 data = store.getAll();
             data.onsuccess=resp=>{
-                this.lecturas = data.result;
-                console.log( this.lecturas, this.lecturas[0].lecturas );
+                this.libros = data.result;
+                console.log( this.libros, this.libros[0].libros );
             };
         },
         mostrarLectura(pro){
-            this.lectura = pro;
-            this.lectura.accion='modificar';
+            this.libro = pro;
+            this.libro.accion='modificar';
         },
         limpiar(){
-            this.lectura.accion='nuevo';
-            this.lectura.lecturas = [];
+            this.libro.accion='nuevo';
+            this.libro.libros = [];
             this.obtenerDatos();
         },
         eliminarLectura(pro){
-            if( confirm(`Esta seguro que desea eliminar el lectura:  ${ new Date(pro.fecha).toLocaleDateString() }`) ){
-                this.lectura = pro;
-                this.lectura.accion='eliminar';
-                fetch(`private/modulos/lecturas/administracion.php?lectura=${JSON.stringify(this.lectura)}`,
+            if( confirm(`Esta seguro que desea eliminar el libro:  ${ new Date(pro.fecha).toLocaleDateString() }`) ){
+                this.libro = pro;
+                this.libro.accion='eliminar';
+                fetch(`private/modulos/libros/administracion.php?libro=${JSON.stringify(this.libro)}`,
                     {credentials: 'same-origin'})
                     .then(resp=>resp.json())
                     .then(resp=>{
@@ -126,8 +117,8 @@ Vue.component('component-lecturas',{
                         this.mostrarMsg('Registro se guardo con exito',false);
                     });
 
-                let store = this.abrirStore("tbllecturas",'readwrite'),
-                    req = store.delete(pro.idLectura);
+                let store = this.abrirStore("tbllibros",'readwrite'),
+                    req = store.delete(pro.idLibro);
                 req.onsuccess=resp=>{
                     this.mostrarMsg('Registro eliminado con exito',true);
                     this.obtenerDatos();
@@ -157,7 +148,7 @@ Vue.component('component-lecturas',{
                                     <h5>REGISTRO DE LECTURAS</h5>
                                 </div>
                                 <div class="col-1 align-middle" >
-                                    <button type="button" onclick="appVue.forms['lectura'].mostrar=false" class="btn-close" aria-label="Close"></button>
+                                    <button type="button" onclick="appVue.forms['libro'].mostrar=false" class="btn-close" aria-label="Close"></button>
                                 </div>
                             </div>
                         </div>
@@ -165,17 +156,17 @@ Vue.component('component-lecturas',{
                     <div class="row p-2">
                         <div class="col-sm">FECHA:</div>
                         <div class="col-sm">
-                            <input v-model="lectura.fecha" required type="date" class="form-control form-control-sm" >
+                            <input v-model="libro.fecha" required type="date" class="form-control form-control-sm" >
                         </div>
                     </div>
                     <div class="row p-2 bg-success">
-                        <div class="col-sm">CLIENTE:</div>
+                        <div class="col-sm">AUTOR:</div>
                         <div class="col-sm">Lectura Anterior</div>
                         <div class="col-sm">Lectura Actual</div>
                         <div class="col-sm">Pago</div>
                     </div>
-                    <div v-for="lecturaCliente in lectura.lecturas" class="row p-2">
-                        <div class="col-sm">{{ lecturaCliente.cliente }}</div>
+                    <div v-for="lecturaCliente in libro.libros" class="row p-2">
+                        <div class="col-sm">{{ lecturaCliente.autor }}</div>
                         <div class="col-sm">{{ lecturaCliente.lanterior }}</div>
                         <div class="col-sm">
                             <input @change="calcularPago(lecturaCliente)" v-model="lecturaCliente.lactual" required type="text" class="form-control form-control-sm" >
@@ -208,7 +199,7 @@ Vue.component('component-lecturas',{
                                 <thead>
                                     <tr>
                                         <td colspan="5">
-                                            <input v-model="buscar" v-on:keyup="buscandoLectura" type="text" class="form-control form-contro-sm" placeholder="Buscar lecturas">
+                                            <input v-model="buscar" v-on:keyup="buscandoLectura" type="text" class="form-control form-contro-sm" placeholder="Buscar libros">
                                         </td>
                                     </tr>
                                     <tr>
@@ -217,7 +208,7 @@ Vue.component('component-lecturas',{
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="pro in lecturas" v-on:click="mostrarLectura(pro)">
+                                    <tr v-for="pro in libros" v-on:click="mostrarLectura(pro)">
                                         <td>{{ new Date(pro.fecha).toLocaleDateString() }}</td>
                                         <td>
                                             <a @click.stop="eliminarLectura(pro)" class="btn btn-danger">Eliminar</a>

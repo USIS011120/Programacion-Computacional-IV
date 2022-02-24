@@ -1,4 +1,4 @@
-Vue.component('component-clientes',{
+Vue.component('component-autores',{
     data:()=>{
         return {
             accion : 'nuevo',
@@ -6,19 +6,19 @@ Vue.component('component-clientes',{
             status : false,
             error  : false,
             buscar : "",
-            cliente:{
-                idCliente : 0,
+            autor:{
+                idAutor : 0,
                 codigo    : '',
                 nombre    : '',
-                direccion : '',
-                zona  : '',
+                pais : '',
+                telefono  : '',
             },
-            clientes:[]
+            autores:[]
         }
     },
     methods:{
         buscandoCliente(){
-            this.clientes = this.clientes.filter((element,index,clientes) => element.nombre.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 || element.codigo.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 );
+            this.autores = this.autores.filter((element,index,autores) => element.nombre.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 || element.codigo.toUpperCase().indexOf(this.buscar.toUpperCase())>=0 );
             if( this.buscar.length<=0){
                 this.obtenerDatos();
             }
@@ -26,7 +26,7 @@ Vue.component('component-clientes',{
         buscandoCodigoCliente(store){
             let buscarCodigo = new Promise( (resolver,rechazar)=>{
                 let index = store.index("codigo"),
-                    data = index.get(this.cliente.codigo);
+                    data = index.get(this.autor.codigo);
                 data.onsuccess=evt=>{
                     resolver(data);
                 };
@@ -38,16 +38,16 @@ Vue.component('component-clientes',{
         },
         async guardarCliente(){
          
-            let store = this.abrirStore("tblclientes",'readwrite'),
+            let store = this.abrirStore("tblautores",'readwrite'),
                 duplicado = false;
             if( this.accion=='nuevo' ){
-                this.cliente.idCliente = generarIdUnicoDesdeFecha();
+                this.autor.idAutor = generarIdUnicoDesdeFecha();
                 
                 let data = await this.buscandoCodigoCliente(store);
                 duplicado = data.result!=undefined;
             }
             if( duplicado==false){
-                let query = store.put(this.cliente);
+                let query = store.put(this.autor);
                 query.onsuccess=event=>{
                     this.obtenerDatos();
                     this.limpiar();
@@ -59,7 +59,7 @@ Vue.component('component-clientes',{
                     console.log( event );
                 };
             } else{
-                this.mostrarMsg('Codigo de cliente duplicado',true);
+                this.mostrarMsg('Codigo de autor duplicado',true);
             }
         },
         mostrarMsg(msg, error){
@@ -76,29 +76,29 @@ Vue.component('component-clientes',{
             }, time*1000);
         },
         obtenerDatos(){
-            let store = this.abrirStore('tblclientes','readonly'),
+            let store = this.abrirStore('tblautores','readonly'),
                 data = store.getAll();
             data.onsuccess=resp=>{
-                this.clientes = data.result;
+                this.autores = data.result;
             };
         },
         mostrarCliente(pro){
-            this.cliente = pro;
+            this.autor = pro;
             this.accion='modificar';
         },
         limpiar(){
             this.accion='nuevo';
-            this.cliente.idCliente='';
-            this.cliente.codigo='';
-            this.cliente.nombre='';
-            this.cliente.direccion='';
-            this.cliente.zona='';
+            this.autor.idAutor='';
+            this.autor.codigo='';
+            this.autor.nombre='';
+            this.autor.pais='';
+            this.autor.telefono='';
             this.obtenerDatos();
         },
         eliminarCliente(pro){
-            if( confirm(`Esta seguro que desea eliminar el cliente:  ${pro.descripcion}`) ){
-                let store = this.abrirStore("tblclientes",'readwrite'),
-                    req = store.delete(pro.idCliente);
+            if( confirm(`Esta seguro que desea eliminar el autor:  ${pro.descripcion}`) ){
+                let store = this.abrirStore("tblautores",'readwrite'),
+                    req = store.delete(pro.idAutor);
                 req.onsuccess=resp=>{
                     this.mostrarMsg('Registro eliminado con exito',true);
                     this.obtenerDatos();
@@ -125,10 +125,10 @@ Vue.component('component-clientes',{
                         <div class="col-sm text-center text-white bg-primary">
                             <div class="row">
                                 <div class="col-11">
-                                    <h5>REGISTRO DE CLIENTES</h5>
+                                    <h5>REGISTRO DE AUTORES</h5>
                                 </div>
                                 <div class="col-1 align-middle" >
-                                    <button type="button" onclick="appVue.forms['cliente'].mostrar=false" class="btn-close" aria-label="Close"></button>
+                                    <button type="button" onclick="appVue.forms['autor'].mostrar=false" class="btn-close" aria-label="Close"></button>
                                 </div>
                             </div>
                         </div>
@@ -136,25 +136,25 @@ Vue.component('component-clientes',{
                     <div class="row p-2">
                         <div class="col-sm">CODIGO:</div>
                         <div class="col-sm">
-                            <input v-model="cliente.codigo" required type="text" class="form-control form-control-sm" >
+                            <input v-model="autor.codigo" required type="text" class="form-control form-control-sm" >
                         </div>
                     </div>
                     <div class="row p-2">
                         <div class="col-sm">NOMBRE: </div>
                         <div class="col-sm">
-                            <input v-model="cliente.nombre" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
+                            <input v-model="autor.nombre" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="row p-2">
-                        <div class="col-sm">DIRECCION: </div>
+                        <div class="col-sm">PAIS: </div>
                         <div class="col-sm">
-                            <input v-model="cliente.direccion" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
+                            <input v-model="autor.pais" required pattern="[A-ZÑña-z0-9, ]{5,65}" type="text" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="row p-2">
-                        <div class="col-sm">ZONA: </div>
+                        <div class="col-sm">TELEFONO: </div>
                         <div class="col-sm">
-                            <input v-model="cliente.zona" required type="text" class="form-control form-control-sm">
+                            <input v-model="autor.telefono" required type="text" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="row p-2">
@@ -174,7 +174,7 @@ Vue.component('component-clientes',{
                 <div class="col-sm"></div>
                 <div class="col-sm-6 p-2">
                     <div class="row text-center text-white bg-primary">
-                        <div class="col"><h5>CLIENTES REGISTRADOS</h5></div>
+                        <div class="col"><h5>AUTORES REGISTRADOS</h5></div>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -182,23 +182,23 @@ Vue.component('component-clientes',{
                                 <thead>
                                     <tr>
                                         <td colspan="5">
-                                            <input v-model="buscar" v-on:keyup="buscandoCliente" type="text" class="form-control form-contro-sm" placeholder="Buscar clientes">
+                                            <input v-model="buscar" v-on:keyup="buscandoCliente" type="text" class="form-control form-contro-sm" placeholder="Buscar autores">
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>CODIGO</th>
                                         <th>NOMBRE</th>
-                                        <th>DIRECCION</th>
-                                        <th>ZONA</th>
+                                        <th>PAIS</th>
+                                        <th>TELEFONO</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="pro in clientes" v-on:click="mostrarCliente(pro)">
+                                    <tr v-for="pro in autores" v-on:click="mostrarCliente(pro)">
                                         <td>{{ pro.codigo }}</td>
                                         <td>{{ pro.nombre }}</td>
-                                        <td>{{ pro.direccion }}</td>
-                                        <td>{{ pro.zona }}</td>
+                                        <td>{{ pro.pais }}</td>
+                                        <td>{{ pro.telefono }}</td>
                                         <td>
                                             <a @click.stop="eliminarCliente(pro)" class="btn btn-danger">DEL</a>
                                         </td>

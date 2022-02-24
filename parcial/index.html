@@ -10,14 +10,14 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Sistema de agua</a>
+          <a class="navbar-brand" href="#">Sistema Biblioteca</a>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link mostrar" data-form="cliente" href="#">Clientes</a>
+                    <a class="nav-link mostrar" data-form="autor" href="#">Autores</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link mostrar" data-form="lectura" href="#">Lecturas</a>
+                    <a class="nav-link mostrar" data-form="libro" href="#">Lecturas</a>
                 </li>
             </ul>
           </div>
@@ -25,12 +25,12 @@
       </nav>
 
     <div id="appSistema" class="container-fluid">
-        <component-lecturas ref="lectura" v-show="forms['lectura'].mostrar"></component-lecturas>
-        <component-clientes ref="cliente" v-show="forms['cliente'].mostrar"></component-clientes>
+        <component-lecturas ref="libro" v-show="forms['libro'].mostrar"></component-lecturas>
+        <component-autores ref="autor" v-show="forms['autor'].mostrar"></component-autores>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="lecturas.js"></script>
-    <script src="clientes.js"></script>
+    <script src="autores.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
