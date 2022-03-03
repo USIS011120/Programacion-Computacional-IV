@@ -139,6 +139,7 @@ Vue.component('cliente',{
                     Busqueda de Clientes
                     <button type="button" class="btn-close" data-bs-dismiss="alert" data-bs-target="#carBuscarCliente" aria-label="Close"></button>
                 </div>
+                
                 <div class="card-body">
                     <table class="table table-dark table-hover">
                         <thead>
