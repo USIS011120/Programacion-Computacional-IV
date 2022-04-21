@@ -4,3 +4,4 @@
 
 ![imagen](https://user-images.githubusercontent.com/68836014/155567497-1fd3da13-e763-4b0f-bd05-d831d2376edf.png)
 
+componentes ,drogoble, vue select, graficos, mapas
